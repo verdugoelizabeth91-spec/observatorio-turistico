@@ -1,0 +1,365 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Observatorio Turístico - Registro</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        @keyframes fadeIn { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+        .modal-content { animation: fadeIn 0.2s ease; }
+    </style>
+</head>
+<body class="bg-gray-50 p-6">
+
+<div class="flex flex-col items-center justify-center text-center my-6">
+    <img src="{% static 'turistas/turistas/fondo_corredor.jpg' %}" alt="Logo Mancomunidad" class="w-32 mb-4">
+    <h1 class="text-4xl font-extrabold text-blue-900 uppercase tracking-tight">4 cantones, un solo destino</h1>
+    <p class="text-lg font-semibold text-blue-600 mt-2">CAÑAR • BIBLIÁN • EL TAMBO • SUSCAL</p>
+</div>
+
+<header class="bg-blue-800 text-white shadow-md py-4 px-6 flex justify-between items-center rounded-lg mb-6">
+    <h1 class="text-xl font-bold">Observatorio Turístico - Registro</h1>
+    <div class="flex gap-3">
+        <button onclick="abrirModal()"
+            class="bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2 px-4 rounded transition text-sm">
+            📋 Ingresar Datos Personalizados
+        </button>
+        <a href="{% url 'reporte_turistas' %}"
+            class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition text-sm">
+            📊 Ver Reportes
+        </a>
+        </a>
+        <a href="{% url 'todas_las_entradas' %}"
+            class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded transition text-sm">
+            📋 Mostrar Entradas
+        </a>
+    </div>
+</header>
+    </div>
+</header>
+
+{% if messages %}
+    <div class="mb-4 max-w-4xl mx-auto">
+        {% for message in messages %}
+            <div class="p-4 rounded-lg bg-green-50 border border-green-200 text-green-700 shadow-sm">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<!-- FORMULARIO NORMAL -->
+<div class="bg-white p-6 rounded-xl shadow border border-gray-100 max-w-4xl mx-auto mb-8">
+    <h2 class="text-lg font-bold text-gray-800 mb-4">
+        {% if registro %} ✏️ Editar Datos del Visitante {% else %} Ingresar Datos del Visitante {% endif %}
+    </h2>
+    <form method="POST" action="">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">N° de Personas</label>
+                <input type="number" name="num_personas" placeholder="Ej: 1" required
+                       class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-blue-500 focus:border-blue-500"
+                       value="{{ registro.num_personas|default:'' }}">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Procedencia</label>
+                <select name="procedencia" required class="w-full border border-gray-300 rounded-lg p-2.5 bg-white focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Seleccione el tipo...</option>
+                    <option value="nacional" {% if registro.procedencia == 'nacional' %}selected{% endif %}>Nacional</option>
+                    <option value="extranjero" {% if registro.procedencia == 'extranjero' %}selected{% endif %}>Extranjero</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Lugar Específico</label>
+                <select name="lugar_especifico" id="id_lugar_especifico" required class="w-full border border-gray-300 rounded-lg p-2.5 bg-white focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Seleccione primero la procedencia...</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Motivo del Viaje</label>
+                <select name="motivo_viaje" required class="w-full border border-gray-300 rounded-lg p-2.5 bg-white focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Seleccione el motivo...</option>
+                    <option value="hoteles"       {% if registro.motivo_viaje == 'hoteles' %}selected{% endif %}>Hoteles</option>
+                    <option value="campings"      {% if registro.motivo_viaje == 'campings' %}selected{% endif %}>Campings</option>
+                    <option value="apart_bungal"  {% if registro.motivo_viaje == 'apart_bungal' %}selected{% endif %}>Apart/Bungal</option>
+                    <option value="balnearios"    {% if registro.motivo_viaje == 'balnearios' %}selected{% endif %}>Balnearios</option>
+                    <option value="turismo_rural" {% if registro.motivo_viaje == 'turismo_rural' %}selected{% endif %}>Turismo Rural</option>
+                    <option value="rutas_sender"  {% if registro.motivo_viaje == 'rutas_sender' %}selected{% endif %}>Rutas/Sender</option>
+                    <option value="par_naturales" {% if registro.motivo_viaje == 'par_naturales' %}selected{% endif %}>Par. Naturales</option>
+                    <option value="gastronomia"   {% if registro.motivo_viaje == 'gastronomia' %}selected{% endif %}>Gastronomía</option>
+                    <option value="a_culturales"  {% if registro.motivo_viaje == 'a_culturales' %}selected{% endif %}>A. Culturales</option>
+                    <option value="fiestas"       {% if registro.motivo_viaje == 'fiestas' %}selected{% endif %}>Fiestas</option>
+                    <option value="artesania"     {% if registro.motivo_viaje == 'artesania' %}selected{% endif %}>Artesanía</option>
+                    <option value="ocio"          {% if registro.motivo_viaje == 'ocio' %}selected{% endif %}>Ocio</option>
+                    <option value="a_deportiva"   {% if registro.motivo_viaje == 'a_deportiva' %}selected{% endif %}>A. Deportiva</option>
+                    <option value="transportes"   {% if registro.motivo_viaje == 'transportes' %}selected{% endif %}>Transportes</option>
+                    <option value="info_local"    {% if registro.motivo_viaje == 'info_local' %}selected{% endif %}>Info Local</option>
+                    <option value="c_azahar"      {% if registro.motivo_viaje == 'c_azahar' %}selected{% endif %}>C. Azahar</option>
+                    <option value="c_blanca"      {% if registro.motivo_viaje == 'c_blanca' %}selected{% endif %}>C. Blanca</option>
+                    <option value="benidorm"      {% if registro.motivo_viaje == 'benidorm' %}selected{% endif %}>Benidorm</option>
+                    <option value="otros"         {% if registro.motivo_viaje == 'otros' %}selected{% endif %}>Otros</option>
+                </select>
+            </div>
+        </div>
+        <div class="flex justify-end space-x-3 mt-6">
+            <a href="{% url 'formulario_registro' %}"
+               class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg font-medium transition text-sm">
+                Limpiar
+            </a>
+            <button type="submit"
+                    class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg font-medium shadow-sm transition flex items-center gap-2">
+                💾 {% if registro %} Actualizar Registro {% else %} Guardar Registro {% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- TABLA DE REGISTROS -->
+<div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden max-w-6xl mx-auto">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-100 text-gray-700 text-xs uppercase font-semibold border-b border-gray-200">
+                    <th class="py-3 px-5">Fecha / Hora</th>
+                    <th class="py-3 px-5 text-center">N° Personas</th>
+                    <th class="py-3 px-5">Procedencia</th>
+                    <th class="py-3 px-5">Lugar Específico</th>
+                    <th class="py-3 px-5">Motivo del Viaje</th>
+                    <th class="py-3 px-5 text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="text-sm text-gray-600 divide-y divide-gray-100">
+                {% for reg in registros %}
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="py-3.5 px-5 whitespace-nowrap">{{ reg.fecha_registro|date:"d/m/Y H:i" }}</td>
+                        <td class="py-3.5 px-5 text-center font-semibold text-gray-800">{{ reg.num_personas }}</td>
+                        <td class="py-3.5 px-5">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-medium
+                                {% if reg.procedencia == 'nacional' %}bg-blue-50 text-blue-700{% else %}bg-purple-50 text-purple-700{% endif %}">
+                                {{ reg.procedencia|capfirst }}
+                            </span>
+                        </td>
+                        <td class="py-3.5 px-5 font-medium text-gray-700">{{ reg.lugar_especifico|title }}</td>
+                        <td class="py-3.5 px-5">{{ reg.get_motivo_viaje_display|default:reg.motivo_viaje|title }}</td>
+                        <td class="py-3.5 px-5 text-center space-x-2 whitespace-nowrap">
+                            <a href="{% url 'editar_turista' reg.id %}"
+                               class="inline-block bg-amber-500 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded font-medium transition">
+                                ✏️ Editar
+                            </a>
+                            <a href="{% url 'eliminar_registro' reg.id %}"
+                               class="inline-block bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded font-medium transition"
+                               onclick="return confirm('¿Estás seguro de eliminar este registro?');">
+                                🗑️ Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="py-6 text-center text-gray-400 bg-gray-50">
+                            No hay registros de visitantes cargados.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- MODAL DATOS PERSONALIZADOS -->
+<div id="modal-personalizado"
+     class="fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4"
+     style="display:none;">
+    <div class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-screen overflow-y-auto">
+
+        <div class="bg-blue-800 text-white px-6 py-4 rounded-t-2xl flex justify-between items-center sticky top-0">
+            <h2 class="text-lg font-bold">📋 Ingreso de Datos Personalizados</h2>
+            <button onclick="cerrarModal()" class="text-white hover:text-gray-200 text-3xl font-bold leading-none">&times;</button>
+        </div>
+
+        <form method="POST" action="{% url 'guardar_datos_personalizados' %}">
+            {% csrf_token %}
+            <div class="px-6 py-4">
+
+                <!-- Mes y Año -->
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Mes</label>
+                        <select name="mes" required class="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm">
+                            <option value="1">Enero</option>
+                            <option value="2">Febrero</option>
+                            <option value="3">Marzo</option>
+                            <option value="4">Abril</option>
+                            <option value="5">Mayo</option>
+                            <option value="6">Junio</option>
+                            <option value="7">Julio</option>
+                            <option value="8">Agosto</option>
+                            <option value="9">Septiembre</option>
+                            <option value="10">Octubre</option>
+                            <option value="11">Noviembre</option>
+                            <option value="12">Diciembre</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Año</label>
+                        <select name="año" required class="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm">
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                            <option value="2028">2028</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Procedencia y Lugar -->
+                <div class="grid grid-cols-2 gap-4 mb-5">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Procedencia</label>
+                        <select name="procedencia" required id="modal_procedencia"
+                                class="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm"
+                                onchange="actualizarLugarModal(this.value)">
+                            <option value="">Seleccione...</option>
+                            <option value="nacional">Nacional</option>
+                            <option value="extranjero">Extranjero</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Lugar Específico</label>
+                        <select name="lugar_especifico" required id="modal_lugar"
+                                class="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm">
+                            <option value="">Seleccione primero la procedencia...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <p class="text-xs text-gray-500 mb-3">Ingresa el número de personas para cada motivo. Deja en 0 si no hubo visitas.</p>
+
+                <!-- Tabla motivos -->
+                <div class="border border-gray-200 rounded-xl overflow-hidden">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="bg-slate-100 text-gray-600 text-xs uppercase">
+                                <th class="py-2 px-4 text-left font-semibold">Motivo de viaje</th>
+                                <th class="py-2 px-4 text-center font-semibold w-36">N° Personas</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            {% for key, label in motivos_lista %}
+                            <tr class="{% cycle 'bg-white' 'bg-blue-50' %} hover:bg-yellow-50 transition">
+                                <td class="py-2.5 px-4 text-gray-700 font-medium">{{ label }}</td>
+                                <td class="py-2.5 px-4 text-center">
+                                    <input type="number" name="motivo_{{ key }}" value="0" min="0"
+                                           class="w-24 border border-gray-300 rounded-lg p-1.5 text-center text-sm focus:ring-blue-500 focus:border-blue-500">
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 sticky bottom-0 bg-white rounded-b-2xl">
+                <button type="button" onclick="cerrarModal()"
+                        class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg font-medium transition text-sm">
+                    Cancelar
+                </button>
+                <button type="submit"
+                        class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg font-medium shadow-sm transition text-sm">
+                    💾 Guardar Datos
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // ── Modal ──────────────────────────────────
+    function abrirModal() {
+        document.getElementById('modal-personalizado').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+    function cerrarModal() {
+        document.getElementById('modal-personalizado').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+    document.getElementById('modal-personalizado').addEventListener('click', function(e) {
+        if (e.target === this) cerrarModal();
+    });
+
+    // ── Opciones de lugares ────────────────────
+    const opcionesLugares = {
+        nacional: [
+            { value: "cañar",        text: "Cañar" },
+            { value: "el_tambo",     text: "El Tambo" },
+            { value: "suscal",       text: "Suscal" },
+            { value: "biblián",      text: "Biblián" },
+            { value: "cuenca",       text: "Cuenca" },
+            { value: "quito",        text: "Quito" },
+            { value: "guayaquil",    text: "Guayaquil" },
+            { value: "zona_sierra",  text: "Zona Sierra" },
+            { value: "zona_costa",   text: "Zona Costa" },
+            { value: "zona_oriente", text: "Zona Oriente" },
+            { value: "galápagos",    text: "Galápagos" }
+        ],
+        extranjero: [
+            { value: "estados_unidos",   text: "Estados Unidos" },
+            { value: "américa_n",        text: "América N." },
+            { value: "américa_del_sur",  text: "América del Sur" },
+            { value: "austria",          text: "Austria" },
+            { value: "bélgica",          text: "Bélgica" },
+            { value: "escandinavia",     text: "Escandinavia" },
+            { value: "francia",          text: "Francia" },
+            { value: "holanda",          text: "Holanda" },
+            { value: "italia",           text: "Italia" },
+            { value: "países_asiáticos", text: "Países Asiáticos" },
+            { value: "países_del_este",  text: "Países del Este" },
+            { value: "portugal",         text: "Portugal" },
+            { value: "reino_unido",      text: "Reino Unido" },
+            { value: "suiza",            text: "Suiza" },
+            { value: "baleares",         text: "Baleares" },
+            { value: "otros",            text: "Otros" }
+        ]
+    };
+
+    // ── Lugar para formulario normal ───────────
+    const selectProcedencia = document.querySelector('select[name="procedencia"]');
+    const selectLugar = document.getElementById('id_lugar_especifico');
+    const valorGuardadoAnteriormente = "{{ registro.lugar_especifico|default:'' }}";
+
+    selectProcedencia.addEventListener('change', function() {
+        const val = this.value;
+        selectLugar.innerHTML = '<option value="">Seleccione el lugar...</option>';
+        if (val && opcionesLugares[val]) {
+            opcionesLugares[val].forEach(lugar => {
+                const opt = document.createElement('option');
+                opt.value = lugar.value;
+                opt.text  = lugar.text;
+                if (valorGuardadoAnteriormente === lugar.value) opt.selected = true;
+                selectLugar.appendChild(opt);
+            });
+        } else {
+            selectLugar.innerHTML = '<option value="">Seleccione primero la procedencia...</option>';
+        }
+    });
+
+    if (selectProcedencia.value) {
+        selectProcedencia.dispatchEvent(new Event('change'));
+    }
+
+    // ── Lugar para modal ───────────────────────
+    function actualizarLugarModal(val) {
+        const sel = document.getElementById('modal_lugar');
+        sel.innerHTML = '<option value="">Seleccione el lugar...</option>';
+        if (val && opcionesLugares[val]) {
+            opcionesLugares[val].forEach(lugar => {
+                const opt = document.createElement('option');
+                opt.value = lugar.value;
+                opt.text  = lugar.text;
+                sel.appendChild(opt);
+            });
+        }
+    }
+</script>
+</body>
+</html>

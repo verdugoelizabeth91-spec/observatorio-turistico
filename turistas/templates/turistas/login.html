@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Observatorio Turístico</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+<div class="w-full max-w-md">
+
+    <div class="flex flex-col items-center mb-8">
+        <img src="{% static 'turistas/turistas/fondo_corredor.jpg' %}" class="w-24 mb-4">
+        <h1 class="text-3xl font-extrabold text-blue-900 uppercase tracking-tight">4 cantones, un solo destino</h1>
+        <p class="text-blue-600 font-semibold mt-1">CAÑAR • BIBLIÁN • EL TAMBO • SUSCAL</p>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+        <h2 class="text-xl font-bold text-gray-800 mb-2 text-center">Observatorio Turístico</h2>
+        <p class="text-sm text-gray-500 text-center mb-6">Ingresa tus credenciales para continuar</p>
+
+        {% if form.errors %}
+            <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 mb-4 text-sm text-center">
+                ❌ Usuario o contraseña incorrectos.
+            </div>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Usuario</label>
+                <input type="text" name="username" required autofocus
+                       class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-blue-500 focus:border-blue-500 text-sm">
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+                <input type="password" name="password" required
+                       class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-blue-500 focus:border-blue-500 text-sm">
+            </div>
+            <button type="submit"
+                    class="w-full bg-blue-800 hover:bg-blue-900 text-white font-semibold py-2.5 rounded-lg transition text-sm">
+                Ingresar
+            </button>
+        </form>
+    </div>
+
+    <p class="text-center text-xs text-gray-400 mt-4">Mancomunidad Cañari © 2026</p>
+</div>
+
+</body>
+</html>
