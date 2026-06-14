@@ -9,14 +9,17 @@
     <style>
         @keyframes fadeIn { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
         .modal-content { animation: fadeIn 0.2s ease; }
+        #campo_otros        { display: none; }
+        #campo_zona_texto   { display: none; }
+        #campo_ext_otro     { display: none; }
     </style>
 </head>
 <body class="bg-gray-50 p-6">
 
 <div class="flex flex-col items-center justify-center text-center my-6">
-    <img src="{% static 'turistas/turistas/fondo_corredor.jpg' %}" alt="Logo Mancomunidad" class="w-32 mb-4">
+    <img src="{% static 'turistas/turistas/corredorturistico.png' %}" alt="Logo Mancomunidad" class="w-32 mb-4">
     <h1 class="text-4xl font-extrabold text-blue-900 uppercase tracking-tight">4 cantones, un solo destino</h1>
-    <p class="text-lg font-semibold text-blue-600 mt-2">CAÑAR • BIBLIÁN • EL TAMBO • SUSCAL</p>
+    <p class="text-lg font-semibold text-blue-600 mt-2">CAÑAR • EL TAMBO • SUSCAL • BIBLIÁN</p>
 </div>
 
 <header class="bg-blue-800 text-white shadow-md py-4 px-6 flex justify-between items-center rounded-lg mb-6">
@@ -30,13 +33,10 @@
             class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition text-sm">
             📊 Ver Reportes
         </a>
-        </a>
         <a href="{% url 'todas_las_entradas' %}"
             class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded transition text-sm">
             📋 Mostrar Entradas
         </a>
-    </div>
-</header>
     </div>
 </header>
 
@@ -50,7 +50,6 @@
     </div>
 {% endif %}
 
-<!-- FORMULARIO NORMAL -->
 <div class="bg-white p-6 rounded-xl shadow border border-gray-100 max-w-4xl mx-auto mb-8">
     <h2 class="text-lg font-bold text-gray-800 mb-4">
         {% if registro %} ✏️ Editar Datos del Visitante {% else %} Ingresar Datos del Visitante {% endif %}
@@ -58,52 +57,146 @@
     <form method="POST" action="">
         {% csrf_token %}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Visita</label>
+                <select name="tipo_visita" required
+                        class="w-full border border-gray-300 rounded-lg p-2.5 bg-white focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Seleccione el tipo...</option>
+                    <option value="individual" {% if registro.tipo_visita == 'individual' %}selected{% endif %}>🧑 Visitantes</option>
+                    <option value="grupo"      {% if registro.tipo_visita == 'grupo' %}selected{% endif %}>👥 Grupo</option>
+                </select>
+            </div>
+
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">N° de Personas</label>
-                <input type="number" name="num_personas" placeholder="Ej: 1" required
+                <input type="number" name="num_personas" placeholder="Ej: 1" required min="1"
                        class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-blue-500 focus:border-blue-500"
                        value="{{ registro.num_personas|default:'' }}">
             </div>
+
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Procedencia</label>
-                <select name="procedencia" required class="w-full border border-gray-300 rounded-lg p-2.5 bg-white focus:ring-blue-500 focus:border-blue-500">
+                <select name="procedencia" id="id_procedencia" required
+                        class="w-full border border-gray-300 rounded-lg p-2.5 bg-white focus:ring-blue-500 focus:border-blue-500">
                     <option value="">Seleccione el tipo...</option>
-                    <option value="nacional" {% if registro.procedencia == 'nacional' %}selected{% endif %}>Nacional</option>
-                    <option value="extranjero" {% if registro.procedencia == 'extranjero' %}selected{% endif %}>Extranjero</option>
+                    <option value="nacional"   {% if registro.procedencia == 'nacional' %}selected{% endif %}>🏠 Nacional</option>
+                    <option value="extranjero" {% if registro.procedencia == 'extranjero' %}selected{% endif %}>✈️ Extranjero</option>
                 </select>
             </div>
+
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Lugar Específico</label>
-                <select name="lugar_especifico" id="id_lugar_especifico" required class="w-full border border-gray-300 rounded-lg p-2.5 bg-white focus:ring-blue-500 focus:border-blue-500">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Lugar de Procedencia</label>
+                <select name="lugar_especifico" id="id_lugar_procedencia" required
+                        class="w-full border border-gray-300 rounded-lg p-2.5 bg-white focus:ring-blue-500 focus:border-blue-500">
                     <option value="">Seleccione primero la procedencia...</option>
                 </select>
+                <div id="campo_zona_texto" class="mt-2" style="display:none;">
+                    <input type="text" name="zona_detalle"
+                           placeholder="Escriba la ciudad o lugar de origen..."
+                           class="w-full border border-gray-300 rounded-lg p-2.5 text-sm"
+                           value="{{ registro.zona_detalle|default:'' }}">
+                </div>
+                <div id="campo_ext_otro" class="mt-2" style="display:none;">
+                    <input type="text" name="extranjero_otro_detalle"
+                           placeholder="Escriba el país o región..."
+                           class="w-full border border-gray-300 rounded-lg p-2.5 text-sm"
+                           value="{{ registro.extranjero_otro_detalle|default:'' }}">
+                </div>
             </div>
+
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Motivo del Viaje</label>
-                <select name="motivo_viaje" required class="w-full border border-gray-300 rounded-lg p-2.5 bg-white focus:ring-blue-500 focus:border-blue-500">
-                    <option value="">Seleccione el motivo...</option>
-                    <option value="hoteles"       {% if registro.motivo_viaje == 'hoteles' %}selected{% endif %}>Hoteles</option>
-                    <option value="campings"      {% if registro.motivo_viaje == 'campings' %}selected{% endif %}>Campings</option>
-                    <option value="apart_bungal"  {% if registro.motivo_viaje == 'apart_bungal' %}selected{% endif %}>Apart/Bungal</option>
-                    <option value="balnearios"    {% if registro.motivo_viaje == 'balnearios' %}selected{% endif %}>Balnearios</option>
-                    <option value="turismo_rural" {% if registro.motivo_viaje == 'turismo_rural' %}selected{% endif %}>Turismo Rural</option>
-                    <option value="rutas_sender"  {% if registro.motivo_viaje == 'rutas_sender' %}selected{% endif %}>Rutas/Sender</option>
-                    <option value="par_naturales" {% if registro.motivo_viaje == 'par_naturales' %}selected{% endif %}>Par. Naturales</option>
-                    <option value="gastronomia"   {% if registro.motivo_viaje == 'gastronomia' %}selected{% endif %}>Gastronomía</option>
-                    <option value="a_culturales"  {% if registro.motivo_viaje == 'a_culturales' %}selected{% endif %}>A. Culturales</option>
-                    <option value="fiestas"       {% if registro.motivo_viaje == 'fiestas' %}selected{% endif %}>Fiestas</option>
-                    <option value="artesania"     {% if registro.motivo_viaje == 'artesania' %}selected{% endif %}>Artesanía</option>
-                    <option value="ocio"          {% if registro.motivo_viaje == 'ocio' %}selected{% endif %}>Ocio</option>
-                    <option value="a_deportiva"   {% if registro.motivo_viaje == 'a_deportiva' %}selected{% endif %}>A. Deportiva</option>
-                    <option value="transportes"   {% if registro.motivo_viaje == 'transportes' %}selected{% endif %}>Transportes</option>
-                    <option value="info_local"    {% if registro.motivo_viaje == 'info_local' %}selected{% endif %}>Info Local</option>
-                    <option value="c_azahar"      {% if registro.motivo_viaje == 'c_azahar' %}selected{% endif %}>C. Azahar</option>
-                    <option value="c_blanca"      {% if registro.motivo_viaje == 'c_blanca' %}selected{% endif %}>C. Blanca</option>
-                    <option value="benidorm"      {% if registro.motivo_viaje == 'benidorm' %}selected{% endif %}>Benidorm</option>
-                    <option value="otros"         {% if registro.motivo_viaje == 'otros' %}selected{% endif %}>Otros</option>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Rango de Edad</label>
+                <select name="rango_edad" required
+                        class="w-full border border-gray-300 rounded-lg p-2.5 bg-white focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Seleccione el rango...</option>
+                    <option value="jovenes"         {% if registro.rango_edad == 'jovenes' %}selected{% endif %}>🟢 Jóvenes (16 a 25 años)</option>
+                    <option value="adultos"         {% if registro.rango_edad == 'adultos' %}selected{% endif %}>🔵 Adultos (26 a 50 años)</option>
+                    <option value="adultos_mayores" {% if registro.rango_edad == 'adultos_mayores' %}selected{% endif %}>🟠 51 años en adelante</option>
                 </select>
             </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Medio de Transporte</label>
+                <select name="medio_transporte" required
+                        class="w-full border border-gray-300 rounded-lg p-2.5 bg-white focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Seleccione el transporte...</option>
+                    <option value="vehiculo_propio"      {% if registro.medio_transporte == 'vehiculo_propio' %}selected{% endif %}>🚗 Vehículo Propio</option>
+                    <option value="bus_publico"          {% if registro.medio_transporte == 'bus_publico' %}selected{% endif %}>🚌 Bus Público</option>
+                    <option value="transporte_turistico" {% if registro.medio_transporte == 'transporte_turistico' %}selected{% endif %}>🚐 Transporte Turístico</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Composición del Grupo</label>
+                <select name="composicion_grupo" required
+                        class="w-full border border-gray-300 rounded-lg p-2.5 bg-white focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Seleccione la composición...</option>
+                    <option value="pareja"  {% if registro.composicion_grupo == 'pareja' %}selected{% endif %}>💑 En Pareja</option>
+                    <option value="familia" {% if registro.composicion_grupo == 'familia' %}selected{% endif %}>👨‍👩‍👧‍👦 En Familia</option>
+                    <option value="amigos"  {% if registro.composicion_grupo == 'amigos' %}selected{% endif %}>👫 Con Amigos</option>
+                    <option value="trabajo" {% if registro.composicion_grupo == 'trabajo' %}selected{% endif %}>💼 Actividades de Trabajo</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Motivo del Viaje</label>
+                <select name="motivo_viaje" id="id_motivo_viaje" required
+                        class="w-full border border-gray-300 rounded-lg p-2.5 bg-white focus:ring-blue-500 focus:border-blue-500"
+                        onchange="toggleOtros(this.value)">
+                    <option value="">Seleccione el motivo...</option>
+                    <option value="hospedaje"      {% if registro.motivo_viaje == 'hospedaje' %}selected{% endif %}>🏨 Hospedaje</option>
+                    <option value="gastronomia"    {% if registro.motivo_viaje == 'gastronomia' %}selected{% endif %}>🍽️ Gastronomía</option>
+                    <option value="compras"        {% if registro.motivo_viaje == 'compras' %}selected{% endif %}>🛍️ Compras</option>
+                    <option value="negocios"       {% if registro.motivo_viaje == 'negocios' %}selected{% endif %}>💼 Negocios</option>
+                    <option value="turismo_rural"  {% if registro.motivo_viaje == 'turismo_rural' %}selected{% endif %}>🌾 Turismo Rural</option>
+                    <option value="rutas_senderos" {% if registro.motivo_viaje == 'rutas_senderos' %}selected{% endif %}>🥾 Rutas/Senderos</option>
+                    <option value="par_naturales"  {% if registro.motivo_viaje == 'par_naturales' %}selected{% endif %}>🌿 Par. Naturales</option>
+                    <option value="religioso"      {% if registro.motivo_viaje == 'religioso' %}selected{% endif %}>🙏 Religioso/Peregrinación</option>
+                    <option value="a_culturales"   {% if registro.motivo_viaje == 'a_culturales' %}selected{% endif %}>🎭 A. Culturales</option>
+                    <option value="fiestas"        {% if registro.motivo_viaje == 'fiestas' %}selected{% endif %}>🎉 Fiestas</option>
+                    <option value="artesania"      {% if registro.motivo_viaje == 'artesania' %}selected{% endif %}>🧶 Artesanía</option>
+                    <option value="ocio"           {% if registro.motivo_viaje == 'ocio' %}selected{% endif %}>🌅 Ocio</option>
+                    <option value="a_deportivas"   {% if registro.motivo_viaje == 'a_deportivas' %}selected{% endif %}>⚽ A. Deportivas</option>
+                    <option value="transportes"    {% if registro.motivo_viaje == 'transportes' %}selected{% endif %}>🚌 Transportes</option>
+                    <option value="canar"          {% if registro.motivo_viaje == 'canar' %}selected{% endif %}>🏔️ Cañar</option>
+                    <option value="biblian"        {% if registro.motivo_viaje == 'biblian' %}selected{% endif %}>⛪ Biblián</option>
+                    <option value="el_tambo"       {% if registro.motivo_viaje == 'el_tambo' %}selected{% endif %}>🏘️ El Tambo</option>
+                    <option value="suscal"         {% if registro.motivo_viaje == 'suscal' %}selected{% endif %}>🏘️ Suscal</option>
+                    <option value="ingapirca"      {% if registro.motivo_viaje == 'ingapirca' %}selected{% endif %}>🏛️ Ingapirca</option>
+                    <option value="banos_inca"     {% if registro.motivo_viaje == 'banos_inca' %}selected{% endif %}>♨️ Baños del Inca</option>
+                    <option value="virgen_rocio"   {% if registro.motivo_viaje == 'virgen_rocio' %}selected{% endif %}>🕍 Santuario Virgen del Rocío</option>
+                    <option value="otros"          {% if registro.motivo_viaje == 'otros' %}selected{% endif %}>✏️ Otros</option>
+                </select>
+            </div>
+
+            <div id="campo_otros">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Especifique el motivo</label>
+                <input type="text" name="motivo_otro" placeholder="Escriba el motivo..."
+                       class="w-full border border-gray-300 rounded-lg p-2.5"
+                       value="{{ registro.motivo_otro|default:'' }}">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Estadía</label>
+                <div class="flex gap-4">
+                    <div class="flex-1">
+                        <label class="block text-xs text-gray-500 mb-1">🌞 Días</label>
+                        <input type="number" name="estadia_dias" placeholder="0" min="0"
+                               class="w-full border border-gray-300 rounded-lg p-2.5 text-center"
+                               value="{{ registro.estadia_dias|default:'' }}">
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-xs text-gray-500 mb-1">🌙 Noches</label>
+                        <input type="number" name="estadia_noches" placeholder="0" min="0"
+                               class="w-full border border-gray-300 rounded-lg p-2.5 text-center"
+                               value="{{ registro.estadia_noches|default:'' }}">
+                    </div>
+                </div>
+            </div>
+
         </div>
+
         <div class="flex justify-end space-x-3 mt-6">
             <a href="{% url 'formulario_registro' %}"
                class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg font-medium transition text-sm">
@@ -123,28 +216,67 @@
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="bg-gray-100 text-gray-700 text-xs uppercase font-semibold border-b border-gray-200">
-                    <th class="py-3 px-5">Fecha / Hora</th>
-                    <th class="py-3 px-5 text-center">N° Personas</th>
-                    <th class="py-3 px-5">Procedencia</th>
-                    <th class="py-3 px-5">Lugar Específico</th>
-                    <th class="py-3 px-5">Motivo del Viaje</th>
-                    <th class="py-3 px-5 text-center">Acciones</th>
+                    <th class="py-3 px-4">Fecha / Hora</th>
+                    <th class="py-3 px-4 text-center">Tipo</th>
+                    <th class="py-3 px-4 text-center">Pers.</th>
+                    <th class="py-3 px-4">Procedencia</th>
+                    <th class="py-3 px-4">Lugar Proc.</th>
+                    <th class="py-3 px-4 text-center">Edad</th>
+                    <th class="py-3 px-4">Transporte</th>
+                    <th class="py-3 px-4">Grupo</th>
+                    <th class="py-3 px-4">Motivo</th>
+                    <th class="py-3 px-4 text-center">Estadía</th>
+                    <th class="py-3 px-4 text-center">Acciones</th>
                 </tr>
             </thead>
             <tbody class="text-sm text-gray-600 divide-y divide-gray-100">
                 {% for reg in registros %}
                     <tr class="hover:bg-gray-50 transition">
-                        <td class="py-3.5 px-5 whitespace-nowrap">{{ reg.fecha_registro|date:"d/m/Y H:i" }}</td>
-                        <td class="py-3.5 px-5 text-center font-semibold text-gray-800">{{ reg.num_personas }}</td>
-                        <td class="py-3.5 px-5">
-                            <span class="px-2.5 py-1 rounded-full text-xs font-medium
+                        <td class="py-3 px-4 whitespace-nowrap">{{ reg.fecha_registro|date:"d/m/Y H:i" }}</td>
+                        <td class="py-3 px-4 text-center">
+                            <span class="px-2 py-1 rounded-full text-xs font-medium
+                                {% if reg.tipo_visita == 'grupo' %}bg-emerald-50 text-emerald-700{% else %}bg-gray-100 text-gray-600{% endif %}">
+                                {% if reg.tipo_visita == 'grupo' %}👥 Grupo{% else %}🧑 Visitantes{% endif %}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-center font-semibold text-gray-800">{{ reg.num_personas }}</td>
+                        <td class="py-3 px-4">
+                            <span class="px-2 py-1 rounded-full text-xs font-medium
                                 {% if reg.procedencia == 'nacional' %}bg-blue-50 text-blue-700{% else %}bg-purple-50 text-purple-700{% endif %}">
                                 {{ reg.procedencia|capfirst }}
                             </span>
                         </td>
-                        <td class="py-3.5 px-5 font-medium text-gray-700">{{ reg.lugar_especifico|title }}</td>
-                        <td class="py-3.5 px-5">{{ reg.get_motivo_viaje_display|default:reg.motivo_viaje|title }}</td>
-                        <td class="py-3.5 px-5 text-center space-x-2 whitespace-nowrap">
+                        <td class="py-3 px-4 text-xs text-gray-700">{{ reg.lugar_especifico|title|default:"—" }}</td>
+                        <td class="py-3 px-4 text-center text-xs">
+                            {% if reg.rango_edad == 'jovenes' %}🟢 16-25
+                            {% elif reg.rango_edad == 'adultos' %}🔵 26-50
+                            {% elif reg.rango_edad == 'adultos_mayores' %}🟠 51+
+                            {% else %}—{% endif %}
+                        </td>
+                        <td class="py-3 px-4 text-xs">
+                            {% if reg.medio_transporte == 'vehiculo_propio' %}🚗 Vehículo
+                            {% elif reg.medio_transporte == 'bus_publico' %}🚌 Bus
+                            {% elif reg.medio_transporte == 'transporte_turistico' %}🚐 Turístico
+                            {% else %}—{% endif %}
+                        </td>
+                        <td class="py-3 px-4 text-xs">
+                            {% if reg.composicion_grupo == 'pareja' %}💑 Pareja
+                            {% elif reg.composicion_grupo == 'familia' %}👨‍👩‍👧‍👦 Familia
+                            {% elif reg.composicion_grupo == 'amigos' %}👫 Amigos
+                            {% elif reg.composicion_grupo == 'trabajo' %}💼 Trabajo
+                            {% else %}—{% endif %}
+                        </td>
+                        <td class="py-3 px-4 text-xs">
+                            {% if reg.motivo_viaje == 'otros' and reg.motivo_otro %}
+                                ✏️ {{ reg.motivo_otro }}
+                            {% else %}
+                                {{ reg.get_motivo_viaje_display|default:reg.motivo_viaje|title }}
+                            {% endif %}
+                        </td>
+                        <td class="py-3 px-4 text-center text-xs whitespace-nowrap">
+                            {{ reg.estadia_dias|default:"0" }}d / {{ reg.estadia_noches|default:"0" }}n
+                        </td>
+                        <td class="py-3 px-4 text-center space-x-1 whitespace-nowrap">
                             <a href="{% url 'editar_turista' reg.id %}"
                                class="inline-block bg-amber-500 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded font-medium transition">
                                 ✏️ Editar
@@ -158,7 +290,7 @@
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan="6" class="py-6 text-center text-gray-400 bg-gray-50">
+                        <td colspan="11" class="py-6 text-center text-gray-400 bg-gray-50">
                             No hay registros de visitantes cargados.
                         </td>
                     </tr>
@@ -179,11 +311,202 @@
             <button onclick="cerrarModal()" class="text-white hover:text-gray-200 text-3xl font-bold leading-none">&times;</button>
         </div>
 
-        <form method="POST" action="{% url 'guardar_datos_personalizados' %}">
+        <div class="flex border-b border-gray-200 px-6 pt-4">
+            <button type="button" onclick="cambiarTab('dia')" id="tab_dia"
+                    class="px-4 py-2 text-sm font-medium border-b-2 border-blue-600 text-blue-600 mr-4">
+                📅 Por Día
+            </button>
+            <button type="button" onclick="cambiarTab('mes')" id="tab_mes"
+                    class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+                📆 Por Mes
+            </button>
+        </div>
+
+        <!-- FORMULARIO POR DÍA -->
+        <form id="form_dia" method="POST" action="{% url 'guardar_datos_personalizados' %}">
             {% csrf_token %}
+            <input type="hidden" name="modo" value="dia">
             <div class="px-6 py-4">
 
-                <!-- Mes y Año -->
+                <div class="grid grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">📅 Día</label>
+                        <input type="number" name="dia" min="1" max="31" placeholder="Ej: 15" required
+                               class="w-full border border-gray-300 rounded-lg p-2.5 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Mes</label>
+                        <select name="mes" required class="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm">
+                            <option value="1">Enero</option>
+                            <option value="2">Febrero</option>
+                            <option value="3">Marzo</option>
+                            <option value="4">Abril</option>
+                            <option value="5">Mayo</option>
+                            <option value="6">Junio</option>
+                            <option value="7">Julio</option>
+                            <option value="8">Agosto</option>
+                            <option value="9">Septiembre</option>
+                            <option value="10">Octubre</option>
+                            <option value="11">Noviembre</option>
+                            <option value="12">Diciembre</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Año</label>
+                        <select name="anio" required class="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm">
+                            <option value="2025">2025</option>
+                            <option value="2026" selected>2026</option>
+                            <option value="2027">2027</option>
+                            <option value="2028">2028</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Visita</label>
+                        <select name="tipo_visita" required class="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm">
+                            <option value="">Seleccione...</option>
+                            <option value="individual">🧑 Visitantes</option>
+                            <option value="grupo">👥 Grupo</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">N° de Personas</label>
+                        <input type="number" name="num_personas" placeholder="Ej: 1" required min="1"
+                               class="w-full border border-gray-300 rounded-lg p-2.5 text-sm">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Procedencia</label>
+                        <select name="procedencia" required id="modal_procedencia"
+                                class="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm"
+                                onchange="actualizarLugarModal(this.value)">
+                            <option value="">Seleccione...</option>
+                            <option value="nacional">🏠 Nacional</option>
+                            <option value="extranjero">✈️ Extranjero</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Lugar de Procedencia</label>
+                        <select name="lugar_especifico" required id="modal_lugar"
+                                class="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm"
+                                onchange="toggleModalExtra(this.value)">
+                            <option value="">Seleccione primero la procedencia...</option>
+                        </select>
+                        <div id="modal_zona_texto" style="display:none;" class="mt-2">
+                            <input type="text" name="modal_zona_detalle" placeholder="Escriba la ciudad o lugar..."
+                                   class="w-full border border-gray-300 rounded-lg p-2 text-sm">
+                        </div>
+                        <div id="modal_ext_otro" style="display:none;" class="mt-2">
+                            <input type="text" name="modal_extranjero_detalle" placeholder="Escriba el país o región..."
+                                   class="w-full border border-gray-300 rounded-lg p-2 text-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Rango de Edad</label>
+                        <select name="rango_edad" required class="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm">
+                            <option value="">Seleccione...</option>
+                            <option value="jovenes">🟢 Jóvenes (16 a 25 años)</option>
+                            <option value="adultos">🔵 Adultos (26 a 50 años)</option>
+                            <option value="adultos_mayores">🟠 51 años en adelante</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Medio de Transporte</label>
+                        <select name="medio_transporte" required class="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm">
+                            <option value="">Seleccione...</option>
+                            <option value="vehiculo_propio">🚗 Vehículo Propio</option>
+                            <option value="bus_publico">🚌 Bus Público</option>
+                            <option value="transporte_turistico">🚐 Transporte Turístico</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Composición del Grupo</label>
+                        <select name="composicion_grupo" required class="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm">
+                            <option value="">Seleccione...</option>
+                            <option value="pareja">💑 En Pareja</option>
+                            <option value="familia">👨‍👩‍👧‍👦 En Familia</option>
+                            <option value="amigos">👫 Con Amigos</option>
+                            <option value="trabajo">💼 Actividades de Trabajo</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Motivo del Viaje</label>
+                        <select name="motivo_viaje" required id="modal_motivo"
+                                class="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm"
+                                onchange="toggleModalOtros(this.value)">
+                            <option value="">Seleccione...</option>
+                            <option value="hospedaje">🏨 Hospedaje</option>
+                            <option value="gastronomia">🍽️ Gastronomía</option>
+                            <option value="compras">🛍️ Compras</option>
+                            <option value="negocios">💼 Negocios</option>
+                            <option value="turismo_rural">🌾 Turismo Rural</option>
+                            <option value="rutas_senderos">🥾 Rutas/Senderos</option>
+                            <option value="par_naturales">🌿 Par. Naturales</option>
+                            <option value="religioso">🙏 Religioso/Peregrinación</option>
+                            <option value="a_culturales">🎭 A. Culturales</option>
+                            <option value="fiestas">🎉 Fiestas</option>
+                            <option value="artesania">🧶 Artesanía</option>
+                            <option value="ocio">🌅 Ocio</option>
+                            <option value="a_deportivas">⚽ A. Deportivas</option>
+                            <option value="transportes">🚌 Transportes</option>
+                            <option value="canar">🏔️ Cañar</option>
+                            <option value="biblian">⛪ Biblián</option>
+                            <option value="el_tambo">🏘️ El Tambo</option>
+                            <option value="suscal">🏘️ Suscal</option>
+                            <option value="ingapirca">🏛️ Ingapirca</option>
+                            <option value="banos_inca">♨️ Baños del Inca</option>
+                            <option value="virgen_rocio">🕍 Virgen del Rocío</option>
+                            <option value="otros">✏️ Otros</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="modal_campo_otros" style="display:none;" class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Especifique el motivo</label>
+                    <input type="text" name="motivo_otro" placeholder="Escriba el motivo..."
+                           class="w-full border border-gray-300 rounded-lg p-2.5 text-sm">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">🌞 Días</label>
+                        <input type="number" name="estadia_dias" placeholder="0" min="0"
+                               class="w-full border border-gray-300 rounded-lg p-2.5 text-center text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">🌙 Noches</label>
+                        <input type="number" name="estadia_noches" placeholder="0" min="0"
+                               class="w-full border border-gray-300 rounded-lg p-2.5 text-center text-sm">
+                    </div>
+                </div>
+
+            </div>
+            <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 sticky bottom-0 bg-white rounded-b-2xl">
+                <button type="button" onclick="cerrarModal()"
+                        class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg font-medium transition text-sm">Cancelar</button>
+                <button type="submit"
+                        class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg font-medium shadow-sm transition text-sm">
+                    💾 Guardar Registro
+                </button>
+            </div>
+        </form>
+
+        <!-- FORMULARIO POR MES -->
+        <form id="form_mes" method="POST" action="{% url 'guardar_datos_personalizados' %}" style="display:none;">
+            {% csrf_token %}
+            <input type="hidden" name="modo" value="mes">
+            <div class="px-6 py-4">
+
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Mes</label>
@@ -204,77 +527,40 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Año</label>
-                        <select name="año" required class="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm">
-                            <option value="2026">2026</option>
+                        <select name="anio" required class="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm">
+                            <option value="2025">2025</option>
+                            <option value="2026" selected>2026</option>
                             <option value="2027">2027</option>
                             <option value="2028">2028</option>
                         </select>
                     </div>
                 </div>
 
-                <!-- Procedencia y Lugar -->
-                <div class="grid grid-cols-2 gap-4 mb-5">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Procedencia</label>
-                        <select name="procedencia" required id="modal_procedencia"
-                                class="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm"
-                                onchange="actualizarLugarModal(this.value)">
-                            <option value="">Seleccione...</option>
-                            <option value="nacional">Nacional</option>
-                            <option value="extranjero">Extranjero</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Lugar Específico</label>
-                        <select name="lugar_especifico" required id="modal_lugar"
-                                class="w-full border border-gray-300 rounded-lg p-2.5 bg-white text-sm">
-                            <option value="">Seleccione primero la procedencia...</option>
-                        </select>
-                    </div>
-                </div>
+                <p class="text-xs text-gray-500 mb-3">Agrega una fila por cada combinación diferente de visitantes del mes.</p>
 
-                <p class="text-xs text-gray-500 mb-3">Ingresa el número de personas para cada motivo. Deja en 0 si no hubo visitas.</p>
+                <div id="contenedor_filas_mes"></div>
 
-                <!-- Tabla motivos -->
-                <div class="border border-gray-200 rounded-xl overflow-hidden">
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr class="bg-slate-100 text-gray-600 text-xs uppercase">
-                                <th class="py-2 px-4 text-left font-semibold">Motivo de viaje</th>
-                                <th class="py-2 px-4 text-center font-semibold w-36">N° Personas</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            {% for key, label in motivos_lista %}
-                            <tr class="{% cycle 'bg-white' 'bg-blue-50' %} hover:bg-yellow-50 transition">
-                                <td class="py-2.5 px-4 text-gray-700 font-medium">{{ label }}</td>
-                                <td class="py-2.5 px-4 text-center">
-                                    <input type="number" name="motivo_{{ key }}" value="0" min="0"
-                                           class="w-24 border border-gray-300 rounded-lg p-1.5 text-center text-sm focus:ring-blue-500 focus:border-blue-500">
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                <button type="button" onclick="agregarFilaMes()"
+                        class="w-full border-2 border-dashed border-gray-300 hover:border-blue-400 text-gray-500 hover:text-blue-500 rounded-lg py-2.5 text-sm font-medium transition mb-2">
+                    + Agregar grupo / procedencia
+                </button>
+
             </div>
 
             <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 sticky bottom-0 bg-white rounded-b-2xl">
                 <button type="button" onclick="cerrarModal()"
-                        class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg font-medium transition text-sm">
-                    Cancelar
-                </button>
+                        class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg font-medium transition text-sm">Cancelar</button>
                 <button type="submit"
                         class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg font-medium shadow-sm transition text-sm">
-                    💾 Guardar Datos
+                    💾 Guardar Datos del Mes
                 </button>
             </div>
         </form>
+
     </div>
 </div>
 
 <script>
-    // ── Modal ──────────────────────────────────
     function abrirModal() {
         document.getElementById('modal-personalizado').style.display = 'flex';
         document.body.style.overflow = 'hidden';
@@ -287,78 +573,287 @@
         if (e.target === this) cerrarModal();
     });
 
-    // ── Opciones de lugares ────────────────────
-    const opcionesLugares = {
-        nacional: [
-            { value: "cañar",        text: "Cañar" },
-            { value: "el_tambo",     text: "El Tambo" },
-            { value: "suscal",       text: "Suscal" },
-            { value: "biblián",      text: "Biblián" },
-            { value: "cuenca",       text: "Cuenca" },
-            { value: "quito",        text: "Quito" },
-            { value: "guayaquil",    text: "Guayaquil" },
-            { value: "zona_sierra",  text: "Zona Sierra" },
-            { value: "zona_costa",   text: "Zona Costa" },
-            { value: "zona_oriente", text: "Zona Oriente" },
-            { value: "galápagos",    text: "Galápagos" }
-        ],
-        extranjero: [
-            { value: "estados_unidos",   text: "Estados Unidos" },
-            { value: "américa_n",        text: "América N." },
-            { value: "américa_del_sur",  text: "América del Sur" },
-            { value: "austria",          text: "Austria" },
-            { value: "bélgica",          text: "Bélgica" },
-            { value: "escandinavia",     text: "Escandinavia" },
-            { value: "francia",          text: "Francia" },
-            { value: "holanda",          text: "Holanda" },
-            { value: "italia",           text: "Italia" },
-            { value: "países_asiáticos", text: "Países Asiáticos" },
-            { value: "países_del_este",  text: "Países del Este" },
-            { value: "portugal",         text: "Portugal" },
-            { value: "reino_unido",      text: "Reino Unido" },
-            { value: "suiza",            text: "Suiza" },
-            { value: "baleares",         text: "Baleares" },
-            { value: "otros",            text: "Otros" }
-        ]
-    };
-
-    // ── Lugar para formulario normal ───────────
-    const selectProcedencia = document.querySelector('select[name="procedencia"]');
-    const selectLugar = document.getElementById('id_lugar_especifico');
-    const valorGuardadoAnteriormente = "{{ registro.lugar_especifico|default:'' }}";
-
-    selectProcedencia.addEventListener('change', function() {
-        const val = this.value;
-        selectLugar.innerHTML = '<option value="">Seleccione el lugar...</option>';
-        if (val && opcionesLugares[val]) {
-            opcionesLugares[val].forEach(lugar => {
-                const opt = document.createElement('option');
-                opt.value = lugar.value;
-                opt.text  = lugar.text;
-                if (valorGuardadoAnteriormente === lugar.value) opt.selected = true;
-                selectLugar.appendChild(opt);
-            });
+    function cambiarTab(tab) {
+        const formDia = document.getElementById('form_dia');
+        const formMes = document.getElementById('form_mes');
+        const tabDia  = document.getElementById('tab_dia');
+        const tabMes  = document.getElementById('tab_mes');
+        if (tab === 'dia') {
+            formDia.style.display = 'block';
+            formMes.style.display = 'none';
+            tabDia.className = 'px-4 py-2 text-sm font-medium border-b-2 border-blue-600 text-blue-600 mr-4';
+            tabMes.className = 'px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700';
         } else {
-            selectLugar.innerHTML = '<option value="">Seleccione primero la procedencia...</option>';
+            formDia.style.display = 'none';
+            formMes.style.display = 'block';
+            tabMes.className = 'px-4 py-2 text-sm font-medium border-b-2 border-blue-600 text-blue-600 mr-4';
+            tabDia.className = 'px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700';
+            if (document.querySelectorAll('#contenedor_filas_mes .fila-mes').length === 0) {
+                agregarFilaMes();
+            }
         }
-    });
-
-    if (selectProcedencia.value) {
-        selectProcedencia.dispatchEvent(new Event('change'));
     }
 
-    // ── Lugar para modal ───────────────────────
+    function toggleOtros(val) {
+        const campo = document.getElementById('campo_otros');
+        const input = campo.querySelector('input');
+        if (val === 'otros') {
+            campo.style.display = 'block';
+            input.required = true;
+        } else {
+            campo.style.display = 'none';
+            input.required = false;
+            input.value = '';
+        }
+    }
+    const motivoActual = document.getElementById('id_motivo_viaje').value;
+    if (motivoActual === 'otros') toggleOtros('otros');
+
+    function toggleModalOtros(val) {
+        const campo = document.getElementById('modal_campo_otros');
+        campo.style.display = val === 'otros' ? 'block' : 'none';
+    }
+
+    const opcionesNacional = [
+        { value: "quito",        text: "🏙️ Quito" },
+        { value: "cuenca",       text: "🏛️ Cuenca" },
+        { value: "guayaquil",    text: "🌊 Guayaquil" },
+        { value: "galapagos",    text: "🐢 Galápagos" },
+        { value: "manta",        text: "🎣 Manta" },
+        { value: "riobamba",     text: "🏔️ Riobamba" },
+        { value: "canar",        text: "🏔️ Cañar" },
+        { value: "biblian",      text: "⛪ Biblián" },
+        { value: "el_tambo",     text: "🏘️ El Tambo" },
+        { value: "suscal",       text: "🏘️ Suscal" },
+        { value: "zona_costa",   text: "🌴 Zona Costa" },
+        { value: "zona_sierra",  text: "⛰️ Zona Sierra" },
+        { value: "zona_oriente", text: "🌿 Zona Oriente" }
+    ];
+    const opcionesExtranjero = [
+        { value: "estados_unidos",  text: "🌎 Estados Unidos" },
+        { value: "canada",          text: "🍁 Canadá" },
+        { value: "francia",         text: "🗼 Francia" },
+        { value: "peru",            text: "🏔️ Perú" },
+        { value: "colombia",        text: "☕ Colombia" },
+        { value: "america_sur",     text: "🌎 América del Sur" },
+        { value: "europa",          text: "🌍 Europa" },
+        { value: "africa",          text: "🌍 África" },
+        { value: "asia",            text: "🌏 Asia" },
+        { value: "otro_extranjero", text: "✏️ Otro (escribir)" }
+    ];
+
+    const sonZonas       = ["zona_costa", "zona_sierra", "zona_oriente"];
+    const esOtroExtranjo = ["otro_extranjero"];
+
+    const selectProcedencia = document.getElementById('id_procedencia');
+    const selectLugarProc   = document.getElementById('id_lugar_procedencia');
+    const campoZona         = document.getElementById('campo_zona_texto');
+    const campoExtOtro      = document.getElementById('campo_ext_otro');
+    const valorGuardadoProc = "{{ registro.lugar_especifico|default:'' }}";
+
+    function llenarLugaresProcedencia(tipo, valorPrevio) {
+        selectLugarProc.innerHTML = '<option value="">Seleccione el lugar...</option>';
+        campoZona.style.display    = 'none';
+        campoExtOtro.style.display = 'none';
+        const opciones = tipo === 'nacional' ? opcionesNacional : tipo === 'extranjero' ? opcionesExtranjero : [];
+        opciones.forEach(lugar => {
+            const opt = document.createElement('option');
+            opt.value = lugar.value;
+            opt.text  = lugar.text;
+            if (valorPrevio === lugar.value) opt.selected = true;
+            selectLugarProc.appendChild(opt);
+        });
+        if (sonZonas.includes(valorPrevio))       campoZona.style.display    = 'block';
+        if (esOtroExtranjo.includes(valorPrevio)) campoExtOtro.style.display = 'block';
+    }
+    selectProcedencia.addEventListener('change', function() {
+        llenarLugaresProcedencia(this.value, '');
+    });
+    selectLugarProc.addEventListener('change', function() {
+        campoZona.style.display    = sonZonas.includes(this.value)       ? 'block' : 'none';
+        campoExtOtro.style.display = esOtroExtranjo.includes(this.value) ? 'block' : 'none';
+    });
+    if (selectProcedencia.value) {
+        llenarLugaresProcedencia(selectProcedencia.value, valorGuardadoProc);
+    }
+
     function actualizarLugarModal(val) {
         const sel = document.getElementById('modal_lugar');
         sel.innerHTML = '<option value="">Seleccione el lugar...</option>';
-        if (val && opcionesLugares[val]) {
-            opcionesLugares[val].forEach(lugar => {
-                const opt = document.createElement('option');
-                opt.value = lugar.value;
-                opt.text  = lugar.text;
-                sel.appendChild(opt);
-            });
-        }
+        document.getElementById('modal_zona_texto').style.display = 'none';
+        document.getElementById('modal_ext_otro').style.display   = 'none';
+        const opciones = val === 'nacional' ? opcionesNacional : val === 'extranjero' ? opcionesExtranjero : [];
+        opciones.forEach(lugar => {
+            const opt = document.createElement('option');
+            opt.value = lugar.value;
+            opt.text  = lugar.text;
+            sel.appendChild(opt);
+        });
+    }
+    function toggleModalExtra(val) {
+        document.getElementById('modal_zona_texto').style.display = sonZonas.includes(val)       ? 'block' : 'none';
+        document.getElementById('modal_ext_otro').style.display   = esOtroExtranjo.includes(val) ? 'block' : 'none';
+    }
+
+    let filasMesContador = 0;
+
+    function agregarFilaMes() {
+        filasMesContador++;
+        const i = filasMesContador;
+        const div = document.createElement('div');
+        div.id = 'fila_mes_' + i;
+        div.className = 'fila-mes border border-gray-200 rounded-xl p-4 mb-3 bg-gray-50 relative';
+        div.innerHTML = `
+    <div class="text-xs font-semibold text-gray-400 mb-3">Registro #${i}</div>
+    <button type="button" onclick="eliminarFilaMes(${i})"
+            class="absolute top-3 right-3 text-gray-400 hover:text-red-500 text-xl font-bold leading-none">&times;</button>
+    <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Tipo de visita</label>
+            <select name="tipo_visita_${i}" required
+                    class="w-full border border-gray-300 rounded-lg p-2 bg-white text-sm">
+                <option value="">Seleccione...</option>
+                <option value="individual">🧑 Visitantes</option>
+                <option value="grupo">👥 Grupo</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">N° de personas</label>
+            <input type="number" name="num_personas_${i}" min="1" placeholder="Ej: 10" required
+                   class="w-full border border-gray-300 rounded-lg p-2 text-sm">
+        </div>
+    </div>
+    <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Tipo de procedencia</label>
+            <select name="procedencia_${i}" required
+                    class="w-full border border-gray-300 rounded-lg p-2 bg-white text-sm"
+                    onchange="actualizarLugarMes(${i}, this.value)">
+                <option value="">Seleccione...</option>
+                <option value="nacional">🏠 Nacional</option>
+                <option value="extranjero">✈️ Extranjero</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Lugar de procedencia</label>
+            <select name="lugar_${i}" id="lugar_mes_${i}"
+                    class="w-full border border-gray-300 rounded-lg p-2 bg-white text-sm"
+                    onchange="toggleLugarTextoMes(${i}, this.value)">
+                <option value="">Seleccione primero...</option>
+            </select>
+            <input type="text" name="lugar_texto_${i}" id="lugar_texto_mes_${i}"
+                   placeholder="Escriba el lugar..." style="display:none;"
+                   class="w-full border border-gray-300 rounded-lg p-2 text-sm mt-1">
+        </div>
+    </div>
+    <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Rango de edad</label>
+            <select name="rango_edad_${i}" class="w-full border border-gray-300 rounded-lg p-2 bg-white text-sm">
+                <option value="">Seleccione...</option>
+                <option value="jovenes">🟢 Jóvenes (16-25)</option>
+                <option value="adultos">🔵 Adultos (26-50)</option>
+                <option value="adultos_mayores">🟠 51 años en adelante</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Medio de transporte</label>
+            <select name="transporte_${i}" class="w-full border border-gray-300 rounded-lg p-2 bg-white text-sm">
+                <option value="">Seleccione...</option>
+                <option value="vehiculo_propio">🚗 Vehículo Propio</option>
+                <option value="bus_publico">🚌 Bus Público</option>
+                <option value="transporte_turistico">🚐 Transporte Turístico</option>
+            </select>
+        </div>
+    </div>
+    <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Composición del grupo</label>
+            <select name="composicion_${i}" class="w-full border border-gray-300 rounded-lg p-2 bg-white text-sm">
+                <option value="">Seleccione...</option>
+                <option value="pareja">💑 En Pareja</option>
+                <option value="familia">👨‍👩‍👧‍👦 En Familia</option>
+                <option value="amigos">👫 Con Amigos</option>
+                <option value="trabajo">💼 Trabajo</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Motivo del viaje</label>
+            <select name="motivo_${i}" class="w-full border border-gray-300 rounded-lg p-2 bg-white text-sm"
+                    onchange="toggleOtrosMesFila(${i}, this.value)">
+                <option value="">Seleccione...</option>
+                <option value="hospedaje">🏨 Hospedaje</option>
+                <option value="gastronomia">🍽️ Gastronomía</option>
+                <option value="compras">🛍️ Compras</option>
+                <option value="negocios">💼 Negocios</option>
+                <option value="turismo_rural">🌾 Turismo Rural</option>
+                <option value="rutas_senderos">🥾 Rutas/Senderos</option>
+                <option value="par_naturales">🌿 Par. Naturales</option>
+                <option value="religioso">🙏 Religioso/Peregrinación</option>
+                <option value="a_culturales">🎭 A. Culturales</option>
+                <option value="fiestas">🎉 Fiestas</option>
+                <option value="artesania">🧶 Artesanía</option>
+                <option value="ocio">🌅 Ocio</option>
+                <option value="a_deportivas">⚽ A. Deportivas</option>
+                <option value="transportes">🚌 Transportes</option>
+                <option value="canar">🏔️ Cañar</option>
+                <option value="biblian">⛪ Biblián</option>
+                <option value="el_tambo">🏘️ El Tambo</option>
+                <option value="suscal">🏘️ Suscal</option>
+                <option value="ingapirca">🏛️ Ingapirca</option>
+                <option value="banos_inca">♨️ Baños del Inca</option>
+                <option value="virgen_rocio">🕍 Virgen del Rocío</option>
+                <option value="otros">✏️ Otros</option>
+            </select>
+            <input type="text" name="motivo_otro_${i}" id="motivo_otro_mes_${i}"
+                   placeholder="Especifique el motivo..." style="display:none;"
+                   class="w-full border border-gray-300 rounded-lg p-2 text-sm mt-1">
+        </div>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+        <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">🌞 Días de estadía</label>
+            <input type="number" name="dias_${i}" min="0" placeholder="0"
+                   class="w-full border border-gray-300 rounded-lg p-2 text-sm text-center">
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">🌙 Noches de estadía</label>
+            <input type="number" name="noches_${i}" min="0" placeholder="0"
+                   class="w-full border border-gray-300 rounded-lg p-2 text-sm text-center">
+        </div>
+    </div>
+
+        `;
+        document.getElementById('contenedor_filas_mes').appendChild(div);
+    }
+
+    function eliminarFilaMes(i) {
+        const el = document.getElementById('fila_mes_' + i);
+        if (el) el.remove();
+    }
+
+    function actualizarLugarMes(i, tipo) {
+        const sel = document.getElementById('lugar_mes_' + i);
+        const txt = document.getElementById('lugar_texto_mes_' + i);
+        sel.innerHTML = '<option value="">Seleccione el lugar...</option>';
+        txt.style.display = 'none';
+        const opciones = tipo === 'nacional' ? opcionesNacional : tipo === 'extranjero' ? opcionesExtranjero : [];
+        opciones.forEach(lugar => {
+            const opt = document.createElement('option');
+            opt.value = lugar.value;
+            opt.text  = lugar.text;
+            sel.appendChild(opt);
+        });
+    }
+
+    function toggleLugarTextoMes(i, val) {
+        const txt = document.getElementById('lugar_texto_mes_' + i);
+        txt.style.display = (sonZonas.includes(val) || esOtroExtranjo.includes(val)) ? 'block' : 'none';
+    }
+
+    function toggleOtrosMesFila(i, val) {
+        const el = document.getElementById('motivo_otro_mes_' + i);
+        if (el) el.style.display = val === 'otros' ? 'block' : 'none';
     }
 </script>
 </body>

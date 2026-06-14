@@ -10,9 +10,9 @@
 <body class="bg-gray-50 p-6">
 
 <div class="flex flex-col items-center justify-center text-center my-6">
-    <img src="{% static 'turistas/turistas/fondo_corredor.jpg' %}" alt="Logo Mancomunidad" class="w-32 mb-4">
+    <img src="{% static 'turistas/turistas/corredorturistico.png' %}" alt="Logo Mancomunidad" class="w-32 mb-4">
     <h1 class="text-4xl font-extrabold text-blue-900 uppercase tracking-tight">4 cantones, un solo destino</h1>
-    <p class="text-lg font-semibold text-blue-600 mt-2">CAÑAR • BIBLIÁN • EL TAMBO • SUSCAL</p>
+    <p class="text-lg font-semibold text-blue-600 mt-2">CAÑAR • EL TAMBO • SUSCAL • BIBLIÁN</p>
 </div>
 
 <header class="bg-blue-800 text-white shadow-md py-4 px-6 flex justify-between items-center rounded-lg mb-6">
@@ -29,52 +29,164 @@
     </div>
 </header>
 
-<!-- FILTRO POR FECHA -->
-<div class="bg-white p-4 rounded-xl shadow border border-gray-100 max-w-6xl mx-auto mb-4 flex items-center gap-4">
-    <label class="text-sm font-medium text-gray-700">Filtrar por fecha:</label>
-    <input type="date" id="filtroFecha"
-           class="border border-gray-300 rounded-lg p-2 text-sm focus:ring-blue-500 focus:border-blue-500">
-    <button onclick="filtrarFecha()"
-            class="bg-blue-700 hover:bg-blue-800 text-white text-sm px-4 py-2 rounded-lg transition">
-        Buscar
-    </button>
-    <button onclick="limpiarFiltro()"
-            class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm px-4 py-2 rounded-lg transition">
-        Ver todos
-    </button>
-    <span class="ml-auto text-sm text-gray-500">
-        Total registros: <strong id="totalRegistros">{{ registros|length }}</strong>
-    </span>
+<!-- FILTROS -->
+<div class="bg-white p-4 rounded-xl shadow border border-gray-100 max-w-7xl mx-auto mb-4">
+
+    <!-- TABS DE MODO -->
+    <div class="flex gap-2 mb-4 border-b border-gray-200 pb-3">
+        <button onclick="setModo('dia')" id="btn_dia"
+                class="px-4 py-2 rounded-lg text-sm font-medium bg-blue-700 text-white transition">
+            📅 Por Día
+        </button>
+        <button onclick="setModo('mes')" id="btn_mes"
+                class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition">
+            📆 Por Mes
+        </button>
+        <button onclick="setModo('rango')" id="btn_rango"
+                class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition">
+            📊 Desde / Hasta
+        </button>
+        <button onclick="setModo('todos')" id="btn_todos"
+                class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition">
+            📋 Todos
+        </button>
+    </div>
+
+    <!-- FILTRO POR DÍA -->
+    <div id="filtro_dia" class="flex items-center gap-3">
+        <label class="text-sm font-medium text-gray-700">Fecha:</label>
+        <input type="date" id="inputDia"
+               class="border border-gray-300 rounded-lg p-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+        <button onclick="aplicarFiltro()"
+                class="bg-blue-700 hover:bg-blue-800 text-white text-sm px-4 py-2 rounded-lg transition">
+            Buscar
+        </button>
+        <span class="ml-auto text-sm text-gray-500">
+            Total registros: <strong id="totalRegistros">{{ registros|length }}</strong>
+        </span>
+    </div>
+
+    <!-- FILTRO POR MES -->
+    <div id="filtro_mes" class="items-center gap-3" style="display:none;">
+        <div class="flex items-center gap-3">
+            <label class="text-sm font-medium text-gray-700">Mes:</label>
+            <select id="inputMes" class="border border-gray-300 rounded-lg p-2 text-sm bg-white">
+                <option value="1">Enero</option>
+                <option value="2">Febrero</option>
+                <option value="3">Marzo</option>
+                <option value="4">Abril</option>
+                <option value="5">Mayo</option>
+                <option value="6">Junio</option>
+                <option value="7">Julio</option>
+                <option value="8">Agosto</option>
+                <option value="9">Septiembre</option>
+                <option value="10">Octubre</option>
+                <option value="11">Noviembre</option>
+                <option value="12">Diciembre</option>
+            </select>
+            <select id="inputAnioMes" class="border border-gray-300 rounded-lg p-2 text-sm bg-white">
+                <option value="2025">2025</option>
+                <option value="2026" selected>2026</option>
+                <option value="2027">2027</option>
+            </select>
+            <button onclick="aplicarFiltro()"
+                    class="bg-blue-700 hover:bg-blue-800 text-white text-sm px-4 py-2 rounded-lg transition">
+                Buscar
+            </button>
+            <span class="ml-auto text-sm text-gray-500">
+                Total registros: <strong id="totalRegistros2">{{ registros|length }}</strong>
+            </span>
+        </div>
+    </div>
+
+    <!-- FILTRO DESDE / HASTA -->
+    <div id="filtro_rango" style="display:none;">
+        <div class="flex items-center gap-3 flex-wrap">
+            <label class="text-sm font-medium text-gray-700">Desde:</label>
+            <input type="date" id="inputDesde"
+                   class="border border-gray-300 rounded-lg p-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+            <label class="text-sm font-medium text-gray-700">Hasta:</label>
+            <input type="date" id="inputHasta"
+                   class="border border-gray-300 rounded-lg p-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+            <button onclick="aplicarFiltro()"
+                    class="bg-blue-700 hover:bg-blue-800 text-white text-sm px-4 py-2 rounded-lg transition">
+                Buscar
+            </button>
+            <span class="ml-auto text-sm text-gray-500">
+                Total registros: <strong id="totalRegistros3">{{ registros|length }}</strong>
+            </span>
+        </div>
+    </div>
+
 </div>
 
 <!-- TABLA COMPLETA -->
-<div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden max-w-6xl mx-auto">
+<div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden max-w-7xl mx-auto">
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse" id="tablaEntradas">
             <thead>
                 <tr class="bg-gray-100 text-gray-700 text-xs uppercase font-semibold border-b border-gray-200">
-                    <th class="py-3 px-5">Fecha / Hora</th>
-                    <th class="py-3 px-5 text-center">N° Personas</th>
-                    <th class="py-3 px-5">Procedencia</th>
-                    <th class="py-3 px-5">Lugar Específico</th>
-                    <th class="py-3 px-5">Motivo del Viaje</th>
-                    <th class="py-3 px-5 text-center">Acciones</th>
+                    <th class="py-3 px-4">Fecha / Hora</th>
+                    <th class="py-3 px-4 text-center">Tipo</th>
+                    <th class="py-3 px-4 text-center">Pers.</th>
+                    <th class="py-3 px-4">Procedencia</th>
+                    <th class="py-3 px-4">Lugar Proc.</th>
+                    <th class="py-3 px-4 text-center">Edad</th>
+                    <th class="py-3 px-4">Transporte</th>
+                    <th class="py-3 px-4">Grupo</th>
+                    <th class="py-3 px-4">Motivo</th>
+                    <th class="py-3 px-4 text-center">Estadía</th>
+                    <th class="py-3 px-4 text-center">Acciones</th>
                 </tr>
             </thead>
             <tbody class="text-sm text-gray-600 divide-y divide-gray-100" id="cuerpoTabla">
                 {% for reg in registros %}
                     <tr class="hover:bg-gray-50 transition" data-fecha="{{ reg.fecha_registro|date:'Y-m-d' }}">
-                        <td class="py-3.5 px-5 whitespace-nowrap">{{ reg.fecha_registro|date:"d/m/Y H:i" }}</td>
-                        <td class="py-3.5 px-5 text-center font-semibold text-gray-800">{{ reg.num_personas }}</td>
-                        <td class="py-3.5 px-5">
-                            <span class="px-2.5 py-1 rounded-full text-xs font-medium
+                        <td class="py-3 px-4 whitespace-nowrap">{{ reg.fecha_registro|date:"d/m/Y H:i" }}</td>
+                        <td class="py-3 px-4 text-center">
+                            <span class="px-2 py-1 rounded-full text-xs font-medium
+                                {% if reg.tipo_visita == 'grupo' %}bg-emerald-50 text-emerald-700{% else %}bg-gray-100 text-gray-600{% endif %}">
+                                {% if reg.tipo_visita == 'grupo' %}👥 Grupo{% else %}🧑 Visitantes{% endif %}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-center font-semibold text-gray-800">{{ reg.num_personas }}</td>
+                        <td class="py-3 px-4">
+                            <span class="px-2 py-1 rounded-full text-xs font-medium
                                 {% if reg.procedencia == 'nacional' %}bg-blue-50 text-blue-700{% else %}bg-purple-50 text-purple-700{% endif %}">
                                 {{ reg.procedencia|capfirst }}
                             </span>
                         </td>
-                        <td class="py-3.5 px-5 font-medium text-gray-700">{{ reg.lugar_especifico|title }}</td>
-                        <td class="py-3.5 px-5">{{ reg.get_motivo_viaje_display|default:reg.motivo_viaje|title }}</td>
-                        <td class="py-3.5 px-5 text-center space-x-2 whitespace-nowrap">
+                        <td class="py-3 px-4 text-xs text-gray-700">{{ reg.lugar_especifico|title|default:"—" }}</td>
+                        <td class="py-3 px-4 text-center text-xs">
+                            {% if reg.rango_edad == 'jovenes' %}🟢 16-25
+                            {% elif reg.rango_edad == 'adultos' %}🔵 26-50
+                            {% elif reg.rango_edad == 'adultos_mayores' %}🟠 51+
+                            {% else %}—{% endif %}
+                        </td>
+                        <td class="py-3 px-4 text-xs">
+                            {% if reg.medio_transporte == 'vehiculo_propio' %}🚗 Vehículo
+                            {% elif reg.medio_transporte == 'bus_publico' %}🚌 Bus
+                            {% elif reg.medio_transporte == 'transporte_turistico' %}🚐 Turístico
+                            {% else %}—{% endif %}
+                        </td>
+                        <td class="py-3 px-4 text-xs">
+                            {% if reg.composicion_grupo == 'pareja' %}💑 Pareja
+                            {% elif reg.composicion_grupo == 'familia' %}👨‍👩‍👧‍👦 Familia
+                            {% elif reg.composicion_grupo == 'amigos' %}👫 Amigos
+                            {% elif reg.composicion_grupo == 'trabajo' %}💼 Trabajo
+                            {% else %}—{% endif %}
+                        </td>
+                        <td class="py-3 px-4 text-xs">
+                            {% if reg.motivo_viaje == 'otros' and reg.motivo_otro %}
+                                ✏️ {{ reg.motivo_otro }}
+                            {% else %}
+                                {{ reg.get_motivo_viaje_display|default:reg.motivo_viaje|title }}
+                            {% endif %}
+                        </td>
+                        <td class="py-3 px-4 text-center text-xs whitespace-nowrap">
+                            {{ reg.estadia_dias|default:"0" }}d / {{ reg.estadia_noches|default:"0" }}n
+                        </td>
+                        <td class="py-3 px-4 text-center space-x-1 whitespace-nowrap">
                             <a href="{% url 'editar_turista' reg.id %}"
                                class="inline-block bg-amber-500 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded font-medium transition">
                                 ✏️ Editar
@@ -88,7 +200,7 @@
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan="6" class="py-6 text-center text-gray-400 bg-gray-50">
+                        <td colspan="11" class="py-6 text-center text-gray-400 bg-gray-50">
                             No hay registros guardados.
                         </td>
                     </tr>
@@ -99,27 +211,71 @@
 </div>
 
 <script>
-    function filtrarFecha() {
-        const fecha = document.getElementById('filtroFecha').value;
-        const filas = document.querySelectorAll('#cuerpoTabla tr[data-fecha]');
-        let visibles = 0;
-        filas.forEach(fila => {
-            if (!fecha || fila.dataset.fecha === fecha) {
-                fila.style.display = '';
-                visibles++;
-            } else {
-                fila.style.display = 'none';
-            }
+    let modoActual = 'dia';
+
+    function setModo(modo) {
+        modoActual = modo;
+        ['dia','mes','rango'].forEach(m => {
+            document.getElementById('filtro_' + m).style.display = 'none';
         });
-        document.getElementById('totalRegistros').textContent = visibles;
+        ['dia','mes','rango','todos'].forEach(m => {
+            document.getElementById('btn_' + m).className =
+                'px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition';
+        });
+        document.getElementById('btn_' + modo).className =
+            'px-4 py-2 rounded-lg text-sm font-medium bg-blue-700 text-white transition';
+
+        if (modo === 'todos') {
+            mostrarTodos();
+        } else {
+            document.getElementById('filtro_' + modo).style.display = 'flex';
+        }
     }
 
-    function limpiarFiltro() {
-        document.getElementById('filtroFecha').value = '';
+    function aplicarFiltro() {
+        const filas = document.querySelectorAll('#cuerpoTabla tr[data-fecha]');
+        let visibles = 0;
+
+        filas.forEach(fila => {
+            const fecha = fila.dataset.fecha;
+            let mostrar = false;
+
+            if (modoActual === 'dia') {
+                const val = document.getElementById('inputDia').value;
+                mostrar = !val || fecha === val;
+
+            } else if (modoActual === 'mes') {
+                const mes  = document.getElementById('inputMes').value.padStart(2,'0');
+                const anio = document.getElementById('inputAnioMes').value;
+                mostrar = fecha.startsWith(anio + '-' + mes);
+
+            } else if (modoActual === 'rango') {
+                const desde = document.getElementById('inputDesde').value;
+                const hasta = document.getElementById('inputHasta').value;
+                mostrar = (!desde || fecha >= desde) && (!hasta || fecha <= hasta);
+            }
+
+            fila.style.display = mostrar ? '' : 'none';
+            if (mostrar) visibles++;
+        });
+
+        ['totalRegistros','totalRegistros2','totalRegistros3'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = visibles;
+        });
+    }
+
+    function mostrarTodos() {
         const filas = document.querySelectorAll('#cuerpoTabla tr[data-fecha]');
         filas.forEach(fila => fila.style.display = '');
-        document.getElementById('totalRegistros').textContent = filas.length;
+        const total = filas.length;
+        ['totalRegistros','totalRegistros2','totalRegistros3'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = total;
+        });
     }
+
+    setModo('dia');
 </script>
 
 </body>
