@@ -50,6 +50,13 @@
         .seccion.visible { animation: fadeIn 0.2s ease; }
         @media print { .no-print { display:none !important; } }
     </style>
+    <link rel="manifest" href="/static/turistas/turistas/manifest.json">
+<meta name="theme-color" content="#1e3a8a">
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/static/turistas/turistas/sw.js');
+  }
+</script>
 </head>
 <body class="bg-gray-50 p-4">
 

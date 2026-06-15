@@ -1,0 +1,21 @@
+{
+  "name": "Observatorio Turístico Cañari",
+  "short_name": "Turístico",
+  "description": "4 Cantones, Un Solo Destino",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e3a8a",
+  "icons": [
+    {
+      "src": "/static/turistas/turistas/corredorturistico.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/turistas/turistas/corredorturistico.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
